@@ -7,13 +7,16 @@ public class ThirdPersonMovement : MonoBehaviour
    public CharacterController controller;
     public Transform cam;
 
-    public float jumpForce = 10;
-    public float gravity = -9.81f;
-    float velocity;
+    int jumpHeight = 10;
+    int jumpCount = 0;
 
+   float velocity;
    public float speed = 6f;
 
-   
+    void Start()
+    {
+        controller = GetComponent<CharacterController>();
+    }
 
     // Update is called once per frame
     void Update()
@@ -26,16 +29,24 @@ public class ThirdPersonMovement : MonoBehaviour
         {
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
             transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
-
-
+            
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward; 
             controller.Move(moveDir.normalized * speed * Time.deltaTime);
         }
-        velocity += gravity * Time.deltaTime;
-        if (Input.GetKeyDown(KeyCode.Space))
+
+        if (Input.GetButtonDown("Jump") && jumpCount == 0)
         {
-            velocity = jumpForce;
+            GetComponent<Character Controller>().AddForce(Vector3.up * jumpHeight, ForceMode.Impulse);
+            jumpCount = 1;
         }
-        transform.Translate(new Vector3(0, velocity, 0) * Time.deltaTime);
+   
+    }
+
+    void OnCollisionEnter(Collision hit)
+    {
+        if (hit.gameObject.CompareTag ("Floor"))
+        {
+            jumpCount = 0;
+        }
     }
 }
