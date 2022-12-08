@@ -12,6 +12,10 @@ public class ThirdPersonMovement : MonoBehaviour
 
    float velocity;
    public float speed = 6f;
+    
+   public float gravity = -10f;
+    private float fallspeed;
+
 
     void Start()
     {
@@ -36,10 +40,19 @@ public class ThirdPersonMovement : MonoBehaviour
 
         if (Input.GetButtonDown("Jump") && jumpCount == 0)
         {
-            GetComponent<Character Controller>().AddForce(Vector3.up * jumpHeight, ForceMode.Impulse);
+            transform.Translate (Vector3.up * Time.deltaTime, Space.World);
             jumpCount = 1;
         }
-   
+        
+        if (controller.isGrounded)
+        {
+            fallspeed = 0;
+        }
+        else
+        {
+            fallspeed += gravity * Time.deltaTime;
+            controller.Move(Vector3.up * fallspeed * Time.deltaTime);
+        }
     }
 
     void OnCollisionEnter(Collision hit)
