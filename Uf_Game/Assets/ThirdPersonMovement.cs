@@ -36,6 +36,9 @@ public class ThirdPersonMovement : MonoBehaviour
 
         moveDir.y -= gravity * Time.deltaTime;
 
+        float targetAngle = Mathf.Atan2(moveDir.x, moveDir.y) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
+
         controller.Move (moveDir * Time.deltaTime);
 
     }
