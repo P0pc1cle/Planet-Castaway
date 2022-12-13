@@ -4,62 +4,39 @@ using UnityEngine;
 
 public class ThirdPersonMovement : MonoBehaviour
 {
-   public CharacterController controller;
-    public Transform cam;
-
-    int jumpHeight = 10;
-    int jumpCount = 0;
-
-   float velocity;
-   public float speed = 6f;
-    
-   public float gravity = -10f;
-    private float fallspeed;
+    private float speed = 10f;
+    private float jumpforce = 8f;
+    private float gravity = 10f;
+    private Vector3 moveDir = Vector3.zero;
 
 
     void Start()
     {
-        controller = GetComponent<CharacterController>();
+      
     }
 
     // Update is called once per frame
     void Update()
     {
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
-        Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
+    CharacterController controller = gameObject.GetComponent<CharacterController> ();
 
-        if (direction.magnitude >= 0.1)
-        {
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
-            transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
-            
-            Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward; 
-            controller.Move(moveDir.normalized * speed * Time.deltaTime);
-        }
-
-        if (Input.GetButtonDown("Jump") && jumpCount == 0)
-        {
-            transform.Translate (Vector3.up * Time.deltaTime, Space.World);
-            jumpCount = 1;
-        }
-        
         if (controller.isGrounded)
         {
-            fallspeed = 0;
-        }
-        else
-        {
-            fallspeed += gravity * Time.deltaTime;
-            controller.Move(Vector3.up * fallspeed * Time.deltaTime);
-        }
-    }
+            moveDir = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
-    void OnCollisionEnter(Collision hit)
-    {
-        if (hit.gameObject.CompareTag ("Floor"))
-        {
-            jumpCount = 0;
+            moveDir = transform.TransformDirection(moveDir);
+
+            moveDir *= speed;
+
+            if (Input.GetButtonDown("Jump"))
+            {
+                moveDir.y = jumpforce;
+            }
         }
+
+        moveDir.y -= gravity * Time.deltaTime;
+
+        controller.Move (moveDir * Time.deltaTime);
+
     }
 }
