@@ -4,27 +4,39 @@ using UnityEngine;
 
 public class ThirdPersonMovement : MonoBehaviour
 {
-   public CharacterController controller;
-   
-   public float speed = 6f;
+    private float speed = 10f;
+    private float jumpforce = 8f;
+    private float gravity = 10f;
+    private Vector3 moveDir = Vector3.zero;
 
-    public float turnSmoothTime = 0.1f;
-    float turnSmoothVelocity;
+
+    void Start()
+    {
+      
+    }
 
     // Update is called once per frame
     void Update()
     {
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
-        Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
+    CharacterController controller = gameObject.GetComponent<CharacterController> ();
 
-        if (direction.magnitude >= 0.1)
+        if (controller.isGrounded)
         {
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-            float angle = Mathf.SmoothDampAngle(transform.eulerlAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            moveDir = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
-            controller.Move(direction * speed * Time.deltaTime);
+            moveDir = transform.TransformDirection(moveDir);
+
+            moveDir *= speed;
+
+            if (Input.GetButtonDown("Jump"))
+            {
+                moveDir.y = jumpforce;
+            }
         }
+
+        moveDir.y -= gravity * Time.deltaTime;
+
+        controller.Move (moveDir * Time.deltaTime);
+
     }
 }
