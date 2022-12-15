@@ -8,10 +8,10 @@ public class ThirdPersonMovement : MonoBehaviour
     public Camera followCamera;
     public float rotationSpeed = 360f;
     public float jumpSpeed = 10f;
+    public CameraRot = GetComponent<Camera>();
 
     private Rigidbody m_Rb;
     private Vector3 m_CameraPos;
-    private float jumpCount = 0;
 
     // Start is called before the first frame update
     void Awake()
@@ -21,7 +21,7 @@ public class ThirdPersonMovement : MonoBehaviour
         
     }
 
-    void FixedUpdate()
+    void Update()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
@@ -29,17 +29,11 @@ public class ThirdPersonMovement : MonoBehaviour
         Vector3 movement = new Vector3(horizontalInput, 0, verticalInput).normalized;
 
         
-        if (Input.GetKeyDown("Jump") && jumpCount == 0)
+        if (Input.GetKeyDown("space"))
         {
             m_Rb.AddForce(new Vector3(0, jumpSpeed, 0), ForceMode.Impulse);
-            jumpCount = 1;
         }
       
-        if(hit.gameObject.tag == "Floor")
-        {
-            jumpCount = 0;
-        }  
-
         if (movement == Vector3.zero)
         {
             return;
@@ -48,13 +42,13 @@ public class ThirdPersonMovement : MonoBehaviour
        
         
 
-        Quaternion targetRotation = Quaternion.LookRotation(movement);
+        Quaternion targetRotation = Quaternion.LookRotation(movement + Quaternion.Euler(0, CameraRot.transform.eulerAngles.y, 0));
         targetRotation = Quaternion.RotateTowards(
             transform.rotation,
             targetRotation,
-            rotationSpeed * Time.fixedDeltaTime);
+            rotationSpeed * Time.deltaTime);
 
-        m_Rb.MovePosition(m_Rb.position + movement * speed * Time.fixedDeltaTime);
+        m_Rb.MovePosition(m_Rb.position + movement * speed * Time.deltaTime);
         m_Rb.MoveRotation(targetRotation);
     }
 
