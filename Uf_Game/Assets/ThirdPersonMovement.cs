@@ -8,17 +8,32 @@ public class ThirdPersonMovement : MonoBehaviour
     public Camera followCamera;
     public float rotationSpeed = 360f;
     public float jumpSpeed = 10f;
-    public CameraRot = GetComponent<Camera>();
 
     private Rigidbody m_Rb;
     private Vector3 m_CameraPos;
 
+    bool IsGrounded;
     // Start is called before the first frame update
     void Awake()
     {
         m_Rb = GetComponent<Rigidbody>();
         m_CameraPos = followCamera.transform.position - transform.position;
         
+    }
+
+    void OnTriggerStay(Collider other)
+    {        
+        if (other.transform.tag == "Floor")
+        {
+            IsGrounded = true;
+            print("Grounded");
+        }
+        else
+        {
+            IsGrounded = false;
+            print("Not Grounded");
+        }
+
     }
 
     void Update()
@@ -31,7 +46,10 @@ public class ThirdPersonMovement : MonoBehaviour
         
         if (Input.GetKeyDown("space"))
         {
-            m_Rb.AddForce(new Vector3(0, jumpSpeed, 0), ForceMode.Impulse);
+            if (IsGrounded == true)
+            {
+                m_Rb.AddForce(new Vector3(0, jumpSpeed, 0), ForceMode.Impulse);
+            }
         }
       
         if (movement == Vector3.zero)
@@ -42,7 +60,7 @@ public class ThirdPersonMovement : MonoBehaviour
        
         
 
-        Quaternion targetRotation = Quaternion.LookRotation(movement + Quaternion.Euler(0, CameraRot.transform.eulerAngles.y, 0));
+        Quaternion targetRotation = Quaternion.LookRotation(movement);
         targetRotation = Quaternion.RotateTowards(
             transform.rotation,
             targetRotation,
@@ -52,6 +70,7 @@ public class ThirdPersonMovement : MonoBehaviour
         m_Rb.MoveRotation(targetRotation);
     }
 
+    
     
 
     private void LateUpdate()
