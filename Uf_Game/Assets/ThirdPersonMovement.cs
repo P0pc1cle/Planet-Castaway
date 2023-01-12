@@ -4,79 +4,87 @@ using UnityEngine;
 
 public class ThirdPersonMovement : MonoBehaviour
 {
-    public float speed = 8.0f;
-    public Camera followCamera;
-    public float rotationSpeed = 360f;
-    public float jumpSpeed = 10f;
+    //VARIABLES
+    [SerializeField] private float moveSpeed;
+    [SerializeField] private float walkSpeed;
+    [SerializeField] private float runSpeed;
 
-    private Rigidbody m_Rb;
-    private Vector3 m_CameraPos;
+    private Vector3 moveDirection;
+    private Vector3 velocity;
 
-    bool IsGrounded;
-    // Start is called before the first frame update
-    void Awake()
+    [SerializeField] private bool isGrounded;
+    [SerializeField] private float groundCheckDistance;
+    [SerializeField] private LayerMask groundMask;
+    [SerializeField] private float gravity;
+
+    //REFERENCES
+    private CharacterController controller;
+
+    private void Start()
     {
-        m_Rb = GetComponent<Rigidbody>();
-        m_CameraPos = followCamera.transform.position - transform.position;
-        
+        controller = GetComponent<CharacterController>();
     }
 
-    void OnTriggerStay(Collider other)
-    {        
-        if (other.transform.tag == "Floor")
-        {
-            IsGrounded = true;
-            print("Grounded");
-        }
-        else
-        {
-            IsGrounded = false;
-            print("Not Grounded");
-        }
-
+    private void Update()
+    {
+        Move();
     }
 
-    void Update()
+    private void Move()
     {
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
+        isGrounded = Physics.CheckSphere(transform.position, groundCheckDistance, groundMask); 
 
-        Vector3 movement = new Vector3(horizontalInput, 0, verticalInput).normalized;
-
-        
-        if (Input.GetKeyDown("space"))
+        if(isGrounded && velocity.y < 0)
         {
-            if (IsGrounded == true)
+            velocity.y = -2f;
+        }
+
+        float moveZ = Input.GetAxis("Vertical");
+
+        moveDirection = new Vector3(0, 0, moveZ);
+
+        if(isGrounded)
+        {
+            if(moveDirection != Vector3.zero && !Input.GetKey(KeyCode.LeftShift))
             {
-                m_Rb.AddForce(new Vector3(0, jumpSpeed, 0), ForceMode.Impulse);
+                Walk();
             }
-        }
-      
-        if (movement == Vector3.zero)
-        {
-            return;
-        }
+            else if(moveDirection != Vector3.zero && Input.GetKey(KeyCode.LeftShift))
+            {
+                Run();
+            }
+            else if(moveDirection == Vector3.zero)
+            {
+                Idle();
+            }
 
-       
+            moveDirection *= moveSpeed;
+        }
+        
         
 
-        Quaternion targetRotation = Quaternion.LookRotation(movement);
-        targetRotation = Quaternion.RotateTowards(
-            transform.rotation,
-            targetRotation,
-            rotationSpeed * Time.deltaTime);
 
-        m_Rb.MovePosition(m_Rb.position + movement * speed * Time.deltaTime);
-        m_Rb.MoveRotation(targetRotation);
+
+        controller.Move(moveDirection * Time.deltaTime);
+
+        velocity.y += gravity * Time.deltaTime;
+        controller.Move(velocity * Time.deltaTime);
     }
 
-    
-    
-
-    private void LateUpdate()
+    private void Idle()
     {
-        followCamera.transform.position = m_Rb.position + m_CameraPos;
+
+    }
+
+    private void Walk()
+    {
+        moveSpeed = walkSpeed;
+    }
+
+    private void Run()
+    {
+        moveSpeed = runSpeed;
     }
 
 
-}
+} 
