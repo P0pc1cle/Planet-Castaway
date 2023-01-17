@@ -17,6 +17,8 @@ public class ThirdPersonMovement : MonoBehaviour
     [SerializeField] private LayerMask groundMask;
     [SerializeField] private float gravity;
 
+    [SerializeField] private float jumpHeight;
+
     //REFERENCES
     private CharacterController controller;
 
@@ -36,15 +38,25 @@ public class ThirdPersonMovement : MonoBehaviour
 
         if(isGrounded && velocity.y < 0)
         {
-            velocity.y = -2f;
+            
+            velocity.y = -18f;
         }
 
         float moveZ = Input.GetAxis("Vertical");
 
         moveDirection = new Vector3(0, 0, moveZ);
+        moveDirection = transform.TransformDirection(moveDirection);
 
-        if(isGrounded)
+
+        if (isGrounded)
         {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                Jump();
+            }
+
+        }   
+        
             if(moveDirection != Vector3.zero && !Input.GetKey(KeyCode.LeftShift))
             {
                 Walk();
@@ -59,10 +71,6 @@ public class ThirdPersonMovement : MonoBehaviour
             }
 
             moveDirection *= moveSpeed;
-        }
-        
-        
-
 
 
         controller.Move(moveDirection * Time.deltaTime);
@@ -86,5 +94,9 @@ public class ThirdPersonMovement : MonoBehaviour
         moveSpeed = runSpeed;
     }
 
+    private void Jump()
+    {
+        velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravity);
+    }
 
 } 
