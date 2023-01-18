@@ -615,7 +615,7 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 8
-  gravity: -9.81
+  gravity: -9.82
   jumpHeight: 4
 --- !u!54 &2012925493
 Rigidbody:

@@ -32,9 +32,9 @@ public class CameraController : MonoBehaviour
 
         transform.Rotate(new Vector3(-mouseY * sensVertical, 0, 0));
 
-        if(mouseY == 90f)
+        if(Camera.main.transform.localEulerAngles.x == 90f)
         {
-
+            print("STOOOOOP");
         }
 
     }
