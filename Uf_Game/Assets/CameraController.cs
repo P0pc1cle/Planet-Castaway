@@ -5,7 +5,8 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     //VARIABLES
-    [SerializeField] private float mouseSensitivity;
+    [SerializeField] private float sensHorizontal;
+    [SerializeField] private float sensVertical;
 
     //REFERENCES
     private Transform parent;
@@ -23,9 +24,19 @@ public class CameraController : MonoBehaviour
 
     private void Rotate()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+        float mouseX = Input.GetAxis("Mouse X") * sensHorizontal * Time.deltaTime;
+
+        float mouseY = Input.GetAxis("Mouse Y") * sensVertical * Time.deltaTime;
 
         parent.Rotate(Vector3.up, mouseX);
+
+        transform.Rotate(new Vector3(-mouseY * sensVertical, 0, 0));
+
+        if(mouseY == 90f)
+        {
+
+        }
+
     }
 
 }
