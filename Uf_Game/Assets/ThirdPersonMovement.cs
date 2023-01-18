@@ -21,10 +21,12 @@ public class ThirdPersonMovement : MonoBehaviour
 
     //REFERENCES
     private CharacterController controller;
+    private Animator anim;
 
     private void Start()
     {
         controller = GetComponent<CharacterController>();
+        anim = GetComponentInChildren<Animator>();
     }
 
     private void Update()
@@ -76,17 +78,19 @@ public class ThirdPersonMovement : MonoBehaviour
 
     private void Idle()
     {
-
+        anim.SetFloat("Speed", 0);
     }
 
     private void Walk()
     {
         moveSpeed = walkSpeed;
+        anim.SetFloat("Speed", 0.5f);
     }
 
     private void Run()
     {
         moveSpeed = runSpeed;
+        anim.SetFloat("Speed", 1);
     }
 
     private void Jump()
